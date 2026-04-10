@@ -159,7 +159,7 @@
         margin: 0 !important;
         font-family: inherit;
         color: var(--text-color);
-        white-space: pre-wrap; /* Crucial for wrapping in capture */
+        white-space: pre-wrap; 
         word-wrap: break-word;
     }
 
@@ -629,7 +629,6 @@ If denied reason why:
             console.error(e);
             btn.innerText = "Error"; 
         } finally {
-            // Restore original textareas
             replacements.forEach(pair => {
                 pair.ta.style.display = 'block';
                 pair.div.remove();

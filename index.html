@@ -391,7 +391,6 @@ If denied reason why:
     const auth3rdPartyList = ["payoff", "cancellation", "paidinfull", "history", "statement", "closing", "receipt", "other"];
     const blockNAList = ["loan", "installer"];
 
-    // NEW: List of procedures where cycling E1/E2 is disabled
     const forceE1OnlyList = ["loan", "installer"];
 
     function addRequestRow() {
@@ -474,7 +473,6 @@ If denied reason why:
                 if (blockNAList.includes(s.value)) blockNA = true;
                 if (s.value === "hardship") showHardship = true;
                 
-                // Check if we need to force E1 logic
                 if (forceE1OnlyList.includes(s.value)) forceE1 = true;
 
                 let detail = document.createElement('div');
@@ -489,7 +487,6 @@ If denied reason why:
 
         procText.value = texts.join("\n");
 
-        // Logic to block N/A for Loan/Installer
         if (blockNA) {
             naBtn.classList.add('disabled');
             if (naBtn.classList.contains('selected')) { naBtn.classList.remove('selected'); delText.value = ""; }
@@ -497,7 +494,6 @@ If denied reason why:
             naBtn.classList.remove('disabled');
         }
 
-        // Logic to force E1 if Loan/Installer is selected
         if (forceE1) {
             if (e1Btn.innerText !== "E1") {
                 e1Btn.innerText = "E1";
@@ -525,20 +521,17 @@ If denied reason why:
     const delText = document.getElementById('deliveryText');
 
     e1Btn.onclick = () => {
-        // Determine if any selected select forces E1
         const selects = document.querySelectorAll('.req-select');
         let isForced = false;
         selects.forEach(s => { if (forceE1OnlyList.includes(s.value)) isForced = true; });
 
         if (isForced) {
-            // Simplified Toggle: Only on or off, no cycling E2
             e1Btn.innerText = "E1";
             e1Btn.classList.toggle('selected');
             if (e1Btn.classList.contains('selected')) {
                 naBtn.classList.remove('selected');
             }
         } else {
-            // Original Cycle logic
             const states = ["E1", "E2", "E1 & E2"];
             let idx = states.indexOf(e1Btn.innerText);
             if (!e1Btn.classList.contains('selected')) {

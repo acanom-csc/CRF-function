@@ -436,11 +436,8 @@ If denied reason why:
     }
 
 function logout() {
-    // Clear the verification session
     sessionStorage.removeItem('crf_verified');
     
-    // Force the TOP level window (index.html) to reload
-    // This bypasses the iframe and resets the whole terminal
     window.top.location.href = 'index.html';
 }
     function syncExplanations(changedSelect) {
@@ -633,7 +630,7 @@ async function copyAsImage(btn) {
         canvas.toBlob(blob => {
             const item = new ClipboardItem({ "image/png": blob });
             navigator.clipboard.write([item]);
-            btn.innerText = "Captured! Now go to Outlook and paste it.";
+            btn.innerText = "Captured! Now go to email and paste it.";
         });
     } catch (e) { 
         console.error(e);

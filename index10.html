@@ -212,10 +212,9 @@
     const errorOverlay = document.getElementById('error-overlay');
 
     // Obfuscated Credential
-    const _0x1a2b = "Q29uY29yZDIwMjYh"; // Concord2026!
+    const _0x1a2b = "Q29uY29yZDIwMjYh"; 
 
     function playTerrorSound(type) {
-        // Ensure AudioContext is active on user interaction
         if (audioCtx.state === 'suspended') audioCtx.resume();
         
         const gain = audioCtx.createGain();
@@ -302,14 +301,12 @@
     triggerScan(); 
     setInterval(drawMatrix, 40);
 
-    // LOGO CLICK HANDLER
     document.getElementById('logo-trigger').onclick = function() {
-        // Resume AudioContext immediately on click
         if (audioCtx.state === 'suspended') audioCtx.resume();
         
         if (getComputedStyle(banner).display !== 'none') { location.reload(); return; }
         
-        playTerrorSound('click'); // Click sound restored here
+        playTerrorSound('click'); 
         
         document.body.classList.add('bursting');
         fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => document.getElementById('ip-address').innerText = d.ip).catch(() => document.getElementById('ip-address').innerText = "127.0.0.1");

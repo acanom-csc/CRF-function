@@ -14,6 +14,36 @@
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 
 <style>
+/* Toast Notification Style */
+#toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.toast {
+    background: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin-bottom: 10px;
+    animation: slideIn 0.3s ease-out, fadeOut 0.5s ease-in 4.5s forwards;
+    font-size: 14px;
+    border-left: 5px solid #1e7e34;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; visibility: hidden; }
+}
     :root {
         --bg-color: #eef2f5;
         --container-bg: #ffffff;
@@ -250,7 +280,7 @@
 </style>
 </head>
 <body>
-
+<div id="toast-container"></div>
 <div class="top-section">
     <div class="form-container" id="captureArea">
         <div class="header">
@@ -268,7 +298,9 @@
                             <option value="">SELECT REQUEST / PROCEDURE</option>
                             <option value="loan">Loan Agreement</option>
                             <option value="installer">Installer Agreement</option>
+                            <option value="transfer">Transfer Agreement</option>
                             <option value="payoff">Payoff Quote</option>
+                            <option value="transition">Transition Letter</option>
                             <option value="cancellation">Cancellation Letter</option>
                             <option value="paidinfull">Paid in Full Letter</option>
                             <option value="due">Due Date Change</option>
@@ -364,7 +396,9 @@
     const requestMap = {
         loan: "Borrower requested Loan Agreement",
         installer: "Borrower requested Installer's Agreement",
+        transfer: "Borrower requested Transfer Agreement",
         payoff: "Borrower requested Payoff Quote",
+        transition: "Borrower requested Transition Letter",
         cancellation: "Borrower requested Cancellation Letter",
         paidinfull: "Borrower requested Paid-in-Full Letter",
         due: "Borrower requested Due Date Change",
@@ -389,17 +423,16 @@ If denied reason why:
     };
 
     const labelMap = {
-        loan: "Loan Agreement", installer: "Installer Agreement", payoff: "Payoff Quote",
+        loan: "Loan Agreement", installer: "Installer Agreement", transfer: "Transfer Agreement", payoff: "Payoff Quote", transition: "Transition Letter",
         cancellation: "Cancellation Letter", paidinfull: "Paid in Full Letter", due: "Due Date Change",
         history: "Transaction History", statement: "1 Statement Courtesy", receipt: "Payment Received Letter",
         closing: "Loan Closing Certificate", refund: "Refund", hardship: "Hardship", other: "Other"
     };
 
     const hideList = ["due", "refund", "hardship"];
-    const auth3rdPartyList = ["payoff", "cancellation", "paidinfull", "history", "statement", "closing", "receipt", "other"];
-    const blockNAList = ["loan", "installer"];
-
-    const forceE1OnlyList = ["loan", "installer"];
+    const auth3rdPartyList = ["payoff", "transition", "cancellation", "paidinfull", "history", "statement", "closing", "receipt", "other"];
+    const blockNAList = ["loan", "installer", "transfer"];
+    const forceE1OnlyList = ["loan", "installer", "transfer"];
 
     function addRequestRow() {
         const container = document.getElementById('requestContainer');
@@ -437,9 +470,9 @@ If denied reason why:
 
 function logout() {
     sessionStorage.removeItem('crf_verified');
-    
     window.top.location.href = 'index.html';
 }
+
     function syncExplanations(changedSelect) {
         if (changedSelect && changedSelect.value === "other") {
             const custom = prompt("Enter the custom request name:");
@@ -485,7 +518,6 @@ function logout() {
                 if (auth3rdPartyList.includes(s.value)) showAuthParty = true;
                 if (blockNAList.includes(s.value)) blockNA = true;
                 if (s.value === "hardship") showHardship = true;
-                
                 if (forceE1OnlyList.includes(s.value)) forceE1 = true;
 
                 let detail = document.createElement('div');
@@ -502,7 +534,11 @@ function logout() {
 
         if (blockNA) {
             naBtn.classList.add('disabled');
-            if (naBtn.classList.contains('selected')) { naBtn.classList.remove('selected'); delText.value = ""; }
+            if (naBtn.classList.contains('selected')) { 
+                naBtn.classList.remove('selected'); 
+                delText.readOnly = true;
+                delText.value = ""; 
+            }
         } else {
             naBtn.classList.remove('disabled');
         }
@@ -543,6 +579,7 @@ function logout() {
             e1Btn.classList.toggle('selected');
             if (e1Btn.classList.contains('selected')) {
                 naBtn.classList.remove('selected');
+                delText.readOnly = true;
             }
         } else {
             const states = ["E1", "E2", "E1 & E2"];
@@ -551,6 +588,7 @@ function logout() {
                 e1Btn.classList.add('selected');
                 e1Btn.innerText = "E1";
                 naBtn.classList.remove('selected');
+                delText.readOnly = true;
             } else if (idx < 2) {
                 e1Btn.innerText = states[idx + 1];
             } else {
@@ -564,6 +602,7 @@ function logout() {
     addrBtn.onclick = () => {
         addrBtn.classList.toggle('selected');
         naBtn.classList.remove('selected');
+        delText.readOnly = true;
         updateDeliveryLine();
     };
 
@@ -597,12 +636,22 @@ function logout() {
 
 async function copyAsImage(btn) {
     const area = document.getElementById('captureArea');
-    const originalText = btn.innerText;
-    btn.innerText = "Capturing...";
+    
+    // Helper for notification
+    const showToast = (message, isError = false) => {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        if (isError) toast.style.background = '#dc3545';
+        toast.innerText = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 5000);
+    };
 
     const textareas = area.querySelectorAll('textarea');
     const replacements = [];
 
+    // Swap textareas for divs to capture formatting
     textareas.forEach(ta => {
         const isHidden = window.getComputedStyle(ta).display === 'none';
         const hasContent = ta.value.trim().length > 0;
@@ -615,13 +664,12 @@ async function copyAsImage(btn) {
             ta.parentNode.insertBefore(div, ta);
             replacements.push({div, ta});
         }
-        
         ta.style.display = 'none';
     });
 
     try {
         const canvas = await html2canvas(area, { 
-            scale: 1, 
+            scale: 2, 
             backgroundColor: null,
             logging: false,
             useCORS: true
@@ -630,12 +678,13 @@ async function copyAsImage(btn) {
         canvas.toBlob(blob => {
             const item = new ClipboardItem({ "image/png": blob });
             navigator.clipboard.write([item]);
-            btn.innerText = "Captured! Now go to email and paste it.";
+            showToast("✅ Captured! Now go to email and paste it.");
         });
     } catch (e) { 
         console.error(e);
-        btn.innerText = "Error"; 
+        showToast("❌ Error capturing image.", true); 
     } finally {
+        // Restore original state
         textareas.forEach(ta => {
             ta.style.display = ''; 
         });
@@ -643,15 +692,12 @@ async function copyAsImage(btn) {
         replacements.forEach(pair => {
             pair.div.remove();
         });
-        
-        syncExplanations(); 
-        
-        setTimeout(() => btn.innerText = originalText, 6000);
+
+        // syncExplanations() is NOT called here, so text persists
     }
 }
-    naBtn.classList.add('selected');
 
-    
+naBtn.classList.add('selected');
 </script>
 </body>
 </html>

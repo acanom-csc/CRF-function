@@ -11,7 +11,7 @@
             --void: #020101;
             --concord-crimson: #9e0b0f;
             --concord-orange: #d16b1d;
-            --glass: rgba(6, 2, 2, 0.98);
+            --glass: rgba(6, 2, 2, 0.92);
         }
 
         body, html {
@@ -26,25 +26,31 @@
         #burst-canvas { z-index: 100; pointer-events: none; }
 
         #status-banner, #terminal-footer {
-            position: fixed; left: 0; right: 0; height: 35px;
+            position: fixed; left: 0; right: 0;
             z-index: 200; 
             display: grid; 
             grid-template-columns: 1fr 1fr 1fr; 
             align-items: center;
-            padding: 0 20px; font-family: 'Orbitron'; font-size: 9px;
+            padding: 0 20px; font-family: 'Orbitron'; 
             letter-spacing: 1.5px;
         }
 
+        /* UPDATED: THEMED TO MATCH LOGIN SCREEN */
         #status-banner { 
             top: 0; 
-            background: var(--concord-crimson); 
+            height: 45px;
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             color: white;
-            border-bottom: 2px solid var(--concord-orange); 
+            border-bottom: 2px solid var(--concord-crimson); 
             display: none; 
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
         
         #terminal-footer { 
             bottom: 0; 
+            height: 35px;
             background: rgba(10, 10, 10, 0.6); 
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
@@ -52,11 +58,22 @@
             border-top: 1px solid rgba(209, 107, 29, 0.3); 
             text-transform: uppercase;
             box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+            font-size: 9px;
         }
 
-        .segment-left { text-align: left; }
-        .segment-center { text-align: center; white-space: nowrap; }
-        .segment-right { text-align: right; }
+        /* NEW: STACKED LAYOUT FOR ID AND IP */
+        .segment-left { 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: left; 
+            line-height: 1.2;
+        }
+        .banner-id-label { font-size: 10px; color: #fff; }
+        .banner-ip-label { font-size: 8px; color: var(--concord-orange); opacity: 0.8; }
+
+        .segment-center { text-align: center; white-space: nowrap; font-size: 10px; }
+        .segment-right { text-align: right; font-size: 10px; }
         
         #terminal-footer b, #terminal-footer strong { 
             color: var(--concord-orange); 
@@ -64,7 +81,7 @@
             text-shadow: 0 0 5px rgba(209, 107, 29, 0.2);
         }
         
-        #status-banner b { color: #fff; }
+        #status-banner b { color: var(--concord-orange); }
 
         .status-dot {
             height: 6px; width: 6px; background-color: var(--concord-orange);
@@ -105,6 +122,7 @@
             width: 420px; padding: 50px; background: var(--glass);
             border-left: 4px solid var(--concord-crimson);
             box-shadow: 0 0 120px #000; display: none; text-align: left;
+            backdrop-filter: blur(15px);
         }
         
         .brand-header { border-bottom: 1px solid #333; margin-bottom: 30px; padding-bottom: 20px; }
@@ -145,8 +163,8 @@
         #error-overlay p { font-size: 1.5vw; letter-spacing: 5px; color: #fff; }
 
         #content-frame {
-            position: fixed; top: 37px; left: 0; right: 0; bottom: 0;
-            width: 100%; height: calc(100% - 37px);
+            position: fixed; top: 47px; left: 0; right: 0; bottom: 0;
+            width: 100%; height: calc(100% - 47px);
             background: var(--void); z-index: 40;
             display: none; border: none;
         }
@@ -161,7 +179,10 @@
 </div>
 
 <div id="status-banner">
-    <div class="segment-left">ID <b id="banner-user">---</b></div>
+    <div class="segment-left">
+        <div class="banner-id-label">ID: <b id="banner-user">---</b></div>
+        <div class="banner-ip-label">IP: <span id="banner-ip">0.0.0.0</span></div>
+    </div>
     <div class="segment-center">CONCORD <b>LENDER INTERNAL TOOL</b></div>
     <div class="segment-right" id="display-clock">00:00:00</div>
 </div>
@@ -312,7 +333,16 @@
         if (getComputedStyle(banner).display !== 'none') { location.reload(); return; }
         playTerrorSound('click'); 
         document.body.classList.add('bursting');
-        fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => document.getElementById('ip-address').innerText = d.ip).catch(() => document.getElementById('ip-address').innerText = "127.0.0.1");
+        fetch('https://api.ipify.org?format=json')
+            .then(r => r.json())
+            .then(d => {
+                document.getElementById('ip-address').innerText = d.ip;
+                document.getElementById('banner-ip').innerText = d.ip; // Set banner IP too
+            })
+            .catch(() => {
+                document.getElementById('ip-address').innerText = "127.0.0.1";
+                document.getElementById('banner-ip').innerText = "127.0.0.1";
+            });
         
         const bCanvas = document.getElementById('burst-canvas');
         const bCtx = bCanvas.getContext('2d');
@@ -361,7 +391,7 @@
             document.getElementById('view-wrapper').style.display = 'none';
             footer.style.display = 'none'; 
             banner.style.display = 'grid'; 
-            frame.src = 'crf-funct.htm';
+            frame.src = 'crf-funct.html';
             frame.style.display = 'block';
         } else {
             triggerDramaticError("INVALID_ENCRYPTION_KEY");

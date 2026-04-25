@@ -279,7 +279,7 @@
     }
 </style>
 </head>
-<body>
+<body class="dark-mode">
 <div id="toast-container"></div>
 <div class="top-section">
     <div class="form-container" id="captureArea">
@@ -345,10 +345,8 @@
 </div>
 
 <div class="bottom-section">
-    <div class="section-title">Request Logs & Procedures</div>
-    <div id="requestDisplayArea">
-        <p style="color: #888;"></p>
-    </div>
+    <div class="section-title">case-specific instructions and additional functions for selected procedure</div>
+    <div id="requestDisplayArea"></div>
 
 <div id="hardshipScript">
     <h2>Solar Servicing Financial Hardship Script for Agents</h2>
@@ -420,6 +418,25 @@ Approved / Denied by:
 If denied reason why:
 `,
         other: "Borrower requested [Custom]"
+    };
+
+    // CORRECTION 3: Case-specific random dummy content for the display/iframe area only
+    const instructionMap = {
+        loan: "PROCEDURE: Verify account state. Ensure contract version 4.2 is pulled. Check for original ink signatures.",
+        installer: "PROCEDURE: Cross-reference Installer ID with approved vendor list. Confirm project completion date.",
+        transfer: "PROCEDURE: Ensure both parties have signed the Assumption Agreement. Update deed on file.",
+        payoff: "PROCEDURE: Calculate per diem interest. Quote valid for 10 calendar days only.",
+        transition: "PROCEDURE: Verify new servicer data package. Confirm 'Welcome' package sent to E1.",
+        cancellation: "PROCEDURE: Check 3-day right of rescission window. Notify billing to halt ACH immediately.",
+        paidinfull: "PROCEDURE: Confirm zero balance across all sub-ledgers. File release of lien within 30 days.",
+        due: "PROCEDURE: Validate new date is between 1st and 28th. Check for active autopay conflicts.",
+        history: "PROCEDURE: Export CSV from system 'Phoenix'. Redact partial SSN if sending via unencrypted mail.",
+        statement: "PROCEDURE: Generate PDF for current month. Do not apply late fees to this request.",
+        receipt: "PROCEDURE: Locate batch transaction ID. Verify fund clearance before issuing letter.",
+        closing: "PROCEDURE: Review loan lifecycle audit. Sign-off by Dept Manager required.",
+        refund: "PROCEDURE: Validate overage amount. If >$500, supervisor approval is mandatory.",
+        hardship: "PROCEDURE: Follow the script below. Enter data into the hardship Slack channel immediately.",
+        other: "PROCEDURE: Follow standard escalation path for non-indexed requests."
     };
 
     const labelMap = {
@@ -511,7 +528,11 @@ function logout() {
                 anySelected = true;
                 const key = s.getAttribute('data-custom-key') || s.value;
                 const label = s.options[s.selectedIndex].text;
+                
+                // Keep original explanation textbox content
                 const description = requestMap[key] || "Borrower requested " + label;
+                // Use dummy content for display area only
+                const dummyInstruction = instructionMap[s.value] || "Follow standard procedure.";
                 
                 texts.push(description);
                 if (!hideList.includes(s.value)) allHiddenTypes = false;
@@ -522,13 +543,13 @@ function logout() {
 
                 let detail = document.createElement('div');
                 detail.style.marginBottom = "15px";
-                detail.innerHTML = `<strong>${label.toUpperCase()}:</strong><br>${description.replace(/\n/g, '<br>')}`;
+                detail.innerHTML = `<strong>${label.toUpperCase()}:</strong><br><span style="color:#d16116; font-style:italic;">${dummyInstruction}</span>`;
                 displayArea.appendChild(detail);
             }
         });
 
         hardshipScript.style.display = showHardship ? "block" : "none";
-        if (!anySelected) displayArea.innerHTML = '<p style="color: #888;"></p>';
+        if (!anySelected) displayArea.innerHTML = "";
 
         procText.value = texts.join("\n");
 
@@ -692,11 +713,10 @@ async function copyAsImage(btn) {
         replacements.forEach(pair => {
             pair.div.remove();
         });
-
-        // syncExplanations() is NOT called here, so text persists
     }
 }
-
+// Ensure the UI initializes with Dark Mode settings
+document.body.classList.add('dark-mode');
 naBtn.classList.add('selected');
 </script>
 </body>

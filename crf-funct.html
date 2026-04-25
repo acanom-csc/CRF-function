@@ -127,7 +127,7 @@
     }
 
     .row.hidden {
-        display: flex !important;
+        display: flex !important; 
         max-height: 0;
         opacity: 0;
         border-top: 0 solid transparent;
@@ -394,11 +394,11 @@
         </div>
     </div>
 
-    <div class="button-row">
-        <button class="main-btn" style="background:#28a745; color:white; border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="copyAsImage(this)">Capture Image for email</button>
-        <button class="main-btn" style="background:#6c757d; color:white; border-radius: 0;" onclick="document.body.classList.toggle('dark-mode')">o</button>
-        <button class="main-btn" style="background:#dc3545; color:white; padding: 10px 15px; font-size: 13px; border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="refreshIframe()">↻</button>
-     </div>
+<div class="button-row">
+    <button class="main-btn" style="background:#28a745; color:white; border-top-right-radius: 0; border-bottom-right-radius: 0;" onclick="copyAsImage(this)">Capture Image for email</button>
+    <button class="main-btn" style="background:#6c757d; color:white; border-radius: 0;" onclick="document.body.classList.toggle('dark-mode')">o</button>
+    <button class="main-btn" style="background:#dc3545; color:white; padding: 10px 15px; font-size: 13px; border-radius: 0;" onclick="refreshIframe()">↻</button>
+    <button class="main-btn" style="background:#000; color:white; padding: 10px 15px; font-size: 13px; border-top-left-radius: 0; border-bottom-left-radius: 0;" onclick="logoutParent()">⎋</button>
 </div>
 
 <div class="bottom-section">
@@ -566,7 +566,7 @@ function refreshIframe() {
         const procText = document.getElementById('procedureText');
         const delText = document.getElementById('deliveryText');
         const sendRow = document.getElementById('sendToRow');
-        const explRow = document.getElementById('explanationRow'); 
+        const explRow = document.getElementById('explanationRow');
         const naBtn = document.getElementById('naBtn');
         const e1Btn = document.getElementById('e1Btn');
         const displayArea = document.getElementById('requestDisplayArea');
@@ -816,6 +816,15 @@ async function copyAsImage(btn) {
             s.style.cssText = s.getAttribute('data-original-style');
             s.removeAttribute('data-original-style');
         });
+    }
+}
+function logoutParent() {
+    if(confirm("Are you sure you want to log out?")) {
+        try {
+            window.top.location.href = 'index.html';
+        } catch (e) {
+            parent.location.replace('index.html');
+        }
     }
 }
 document.body.classList.add('dark-mode');

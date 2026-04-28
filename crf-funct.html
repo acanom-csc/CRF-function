@@ -3,41 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>C R F - CONCORD FINANCE LLC</title>
+<title>C R F - CONCORD LENDER INTERNAL TOOL</title>
 
 <script>
+    // 1. Protection: Ensure the file is being loaded inside an iframe
+    if (window.self === window.top) {
+        // If the current window is the top-most window, it's NOT an iframe.
+        // Redirect immediately to the index page.
+        window.location.replace('index.html');
+    }
+
+    // 2. Existing Session Check: Ensure the user has verified the passkey
     if (sessionStorage.getItem('crf_verified') !== 'true') {
         window.location.replace('index.html');
     }
 </script>
 
-<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
 <style>
-    /* Top Persistent Banner */
-    #uptime-banner {
-        position: fixed;
-        top: 0; left: 0; width: 100%; height: 20px;
-        background: rgba(10, 10, 10, 0.95);
-        color: #00ffcc;
-        font-family: 'Courier New', Courier, monospace;
-        font-size: 11px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 30px;
-        z-index: 999999;
-        border-bottom: 1px solid #333;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .chrono-item { display: flex; gap: 8px; align-items: center; }
-    .chrono-limit { color: #888; font-size: 9px; }
-
     /* Notifications/Toasts (Stacked) */
     #toast-container {
         position: fixed;
-        top: 30px; /* offset for banner */
+        top: 20px; 
         left: 50%;
         transform: translateX(-50%);
         z-index: 10000;
@@ -115,7 +101,6 @@
         flex-direction: column;
         height: 100vh;
         overflow: hidden;
-        padding-top: 20px; /* Buffer for banner */
     }
 
     /* Cinematic Elements */
@@ -188,7 +173,7 @@
         width: 100%;
         height: 100%;
         background: #00ffcc;
-        animation: slide-load 2s linear forwards; /* Updated to 2s */
+        animation: slide-load 2s linear forwards;
     }
 
     @keyframes slide-load {
@@ -217,48 +202,81 @@
         background: transparent;
         border: none;
         height: 40px;
-        padding: 10px 20px;
+        padding: 0 20px;
         cursor: pointer;
-        font-weight: bold;
         display: flex;
         align-items: center;
         justify-content: center;
         color: rgba(255,255,255,0.4);
-        text-shadow: 0 0 2px rgba(255,255,255,0.1);
         transition: all 0.3s ease;
         border-right: 1px solid rgba(255,255,255,0.1);
     }
     
-    .quartz-btn:last-child {
+    .quartz-btn:last-of-type {
         border-right: none;
+    }
+
+    .quartz-btn svg {
+        width: 20px;
+        height: 20px;
+        stroke: currentColor;
+        fill: none;
+        stroke-width: 1.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: transform 0.2s;
     }
 
     body:not(.dark-mode) .quartz-btn {
         color: rgba(0,0,0,0.4);
-        text-shadow: 0 0 2px rgba(0,0,0,0.1);
         border-right: 1px solid rgba(0,0,0,0.1);
     }
 
-    .quartz-btn:hover {
-        color: #fff;
-        text-shadow: 0 0 10px rgba(255,255,255,0.8), 0 0 20px rgba(255,255,255,0.5);
-        background: rgba(255,255,255,0.1);
-        border-radius: 15px;
+    /* Target Hover Colors */
+    /* DEPRECATED CAPTURE IMAGE
+    .btn-capture:hover {
+        color: #aaaaaa;
+        text-shadow: 0 0 20px #aaaaaa;
+        background: rgba(170,170,170,0.2);
+        border-radius: 15px 0 0 15px;
     }
+    */
     
-    body:not(.dark-mode) .quartz-btn:hover {
-        color: #000;
-        text-shadow: 0 0 10px rgba(0,0,0,0.8), 0 0 20px rgba(0,0,0,0.5);
-        background: rgba(0,0,0,0.05);
+    .btn-copy:hover {
+        color: #4dabf7;
+        text-shadow: 0 0 20px #4dabf7, 0 0 10px #4dabf7; /* Doubled intensity */
+        background: rgba(77, 171, 247, 0.2); /* Doubled intensity */
     }
 
-    /* Refined Sync Button (Black Button) */
+    .btn-theme:hover {
+        color: #f8f9fa; /* Pearl */
+        text-shadow: 0 0 30px #ffffff, 0 0 50px rgba(255,255,255,1); /* Doubled intensity */
+        background: rgba(248, 249, 250, 0.3); /* Doubled intensity */
+    }
+    
+    body:not(.dark-mode) .btn-theme:hover {
+        color: #0b0f19; /* Obsidian */
+        text-shadow: 0 0 20px #0b0f19, 0 0 40px rgba(0,0,0,1); /* Doubled intensity */
+        background: rgba(11, 15, 25, 0.2); /* Doubled intensity */
+    }
+
+    .btn-refresh:hover {
+        color: #ff8c00;
+        text-shadow: 0 0 20px #ff8c00, 0 0 10px #ff8c00; /* Doubled intensity */
+        background: rgba(255, 140, 0, 0.2); /* Doubled intensity */
+    }
+
+    .quartz-btn:hover svg {
+        transform: scale(1.1);
+    }
+
+    /* Refined Sync Button */
     .sync-btn {
         background: #000;
         border: 1px solid #111;
         width: 40px;
         height: 40px;
-        border-radius: 12px; /* Smoother radius to fit quartz */
+        border-radius: 12px;
         cursor: pointer;
         display: flex;
         align-items: center;
@@ -268,24 +286,29 @@
         box-shadow: inset 0 0 5px rgba(0,0,0,1);
         position: relative;
         overflow: hidden;
+        color: rgba(255,255,255,0.6);
     }
     
     .sync-btn::before {
         content: '';
         position: absolute;
         width: 100%; height: 100%;
-        background: radial-gradient(circle, rgba(255,0,0,0.4) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(255,0,0,0.6) 0%, transparent 60%);
         opacity: 0;
         transition: opacity 0.3s;
+        z-index: 1;
+    }
+
+    .sync-btn:hover {
+        background: #004d4d; /* Medium dark aqua */
+        /* Doubled intensity for hover glow */
+        box-shadow: 0 0 30px rgba(0, 204, 204, 1), inset 0 0 30px rgba(255, 0, 0, 1);
+        border-color: #00e6e6;
+        color: #fff;
     }
 
     .sync-btn:hover::before {
         opacity: 1;
-    }
-
-    .sync-btn:hover {
-        box-shadow: 0 0 15px rgba(255,0,0,0.5), inset 0 0 10px rgba(255,0,0,0.2);
-        border-color: #300;
     }
 
     .pulsate-red {
@@ -294,8 +317,8 @@
     }
 
     @keyframes pulseRedActive {
-        from { box-shadow: 0 0 10px #ff0000, inset 0 0 10px #500; }
-        to { box-shadow: 0 0 25px #ff0000, inset 0 0 20px #a00; }
+        from { box-shadow: 0 0 20px #ff0000, inset 0 0 20px #500; } /* Doubled intensity */
+        to { box-shadow: 0 0 50px #ff0000, inset 0 0 40px #a00; } /* Doubled intensity */
     }
 
     @keyframes flashEntrance {
@@ -305,7 +328,7 @@
     }
 
     /* Dialog Boxes */
-    #dialog-overlay, #abort-overlay {
+    #dialog-overlay {
         position: fixed;
         top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0,0,0,0.85);
@@ -342,16 +365,18 @@
         padding-bottom: 15px;
     }
 
-    .dialog-chrono-grid {
+.dialog-chrono-grid {
         display: grid;
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr; /* Two columns for side-by-side layout */
         gap: 10px;
         margin: 20px 0;
-        text-align: left;
+        text-align: center;
         background: #0a0a0a;
         padding: 15px;
         border-radius: 8px;
         font-family: monospace;
+        font-size: 11px;
+        border: 1px solid #222;
     }
 
     .snooze-ui {
@@ -359,18 +384,19 @@
         align-items: center;
         justify-content: center;
         gap: 15px;
-        margin-bottom: 25px;
+        margin-top: 15px;
+        margin-bottom: 15px;
     }
 
     .wheel-container {
         position: relative;
         height: 60px;
-        width: 120px;
+        width: 140px;
         overflow: auto;
         background: #222;
         border-radius: 8px;
         border: 1px solid #444;
-        scrollbar-width: none; /* Firefox */
+        scrollbar-width: none; 
     }
     .wheel-container::-webkit-scrollbar { display: none; }
     
@@ -386,19 +412,10 @@
     .wheel-item:hover { color: #fff; }
     .wheel-item.active { color: #00ffcc; font-weight: bold; font-size: 16px; }
 
-    input[type="date"].tooltip-cal {
-        background: #222;
-        color: #fff;
-        border: 1px solid #444;
-        padding: 6px;
-        border-radius: 6px;
-        cursor: pointer;
-        outline: none;
-    }
-
     .dialog-actions {
         display: flex;
         gap: 10px;
+        margin-top: 15px;
     }
     
     .dialog-btn {
@@ -414,32 +431,79 @@
     .btn-sync-action { background: #ff4d4d; color: white; }
     .btn-snooze-action { background: #444; color: white; border: 1px solid #666; }
 
-    /* Tactical Abort Button */
-    .tactical-orange {
-        background: #ff5500;
-        color: #fff;
-        border: 4px solid #cc4400;
-        border-radius: 12px;
-        font-size: 32px;
-        font-weight: 900;
-        padding: 20px 50px;
-        cursor: pointer;
-        box-shadow: 0 0 40px #ff5500, inset 0 0 20px #fff;
-        animation: strobeOrange 0.2s infinite alternate;
-        text-transform: uppercase;
-        letter-spacing: 5px;
+    /* Tactical Abort Button & HUD (Redesigned as localized HUD) */
+    #abort-overlay {
+        position: fixed;
+        bottom: 60px; 
+        right: 30px; 
+        width: auto; 
+        height: auto;
+        background: transparent;
+        z-index: 100000;
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
 
-    @keyframes strobeOrange {
-        from { filter: brightness(1); transform: scale(1); }
-        to { filter: brightness(1.5); transform: scale(1.02); }
+    .tactical-hud {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 1px solid rgba(255, 0, 0, 0.3);
+        padding: 30px 40px;
+        background: rgba(10,0,0,0.85);
+        box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.1), 0 0 30px rgba(255,0,0,0.2);
+        position: relative;
+        border-radius: 8px;
+    }
+    
+    .tactical-hud::before, .tactical-hud::after {
+        content: '';
+        position: absolute;
+        width: 30px; height: 30px;
+        border: 2px solid #ff3333;
+    }
+    .tactical-hud::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+    .tactical-hud::after { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+    .tactical-orange {
+        background: transparent;
+        color: #ff3333;
+        border: 2px solid #ff3333;
+        font-family: 'Courier New', monospace;
+        font-size: 24px;
+        font-weight: bold;
+        padding: 10px 40px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        box-shadow: inset 0 0 15px rgba(255,0,0,0.2);
+    }
+
+    .tactical-orange:hover {
+        background: rgba(255, 0, 0, 0.15);
+        text-shadow: 0 0 10px #ff3333;
+        box-shadow: inset 0 0 30px rgba(255,0,0,0.4), 0 0 20px rgba(255,0,0,0.4);
     }
     
     .abort-subtext {
         color: #ffaa80;
-        font-family: monospace;
+        font-family: 'Courier New', monospace;
         margin-top: 15px;
         font-size: 16px;
+        letter-spacing: 2px;
+    }
+    
+    #abort-timer-val {
+        font-size: 28px;
+        font-weight: bold;
+        color: #ff3333;
+        text-shadow: 0 0 15px rgba(255,0,0,0.8);
+        display: inline-block;
+        min-width: 120px;
+        text-align: center;
     }
 
     /* Original UI Layout */
@@ -464,7 +528,7 @@
         border: 1px solid var(--border-color);
         background: var(--container-bg);
         box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        border-radius: 16px; 
+        border-radius: 12px; /* Moderately round as requested */
         overflow: hidden;
     }
 
@@ -554,7 +618,7 @@
     select, input[type="text"] {
         flex-grow: 1;
         border: 1px solid var(--border-color);
-        border-radius: 8px;
+        border-radius: 0; 
         padding: 6px 8px;
         background: var(--input-bg);
         color: var(--text-color);
@@ -596,7 +660,7 @@
     .option {
         flex: 1; padding: 10px; text-align: center;
         border: 1px solid var(--border-color);
-        border-radius: 10px; 
+        border-radius: 4px; 
         cursor: pointer; background: var(--footer-bg);
         font-size: 11px; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         display: flex; align-items: center; justify-content: center;
@@ -610,13 +674,19 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
     .option.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; background: #eee; }
+    
+    /* Disable transitions temporarily during capture */
+    .no-transition * {
+        transition: none !important;
+        animation: none !important;
+    }
 
     #hardshipScript {
         display: none;
         background: var(--container-bg);
         padding: 20px;
         border: 1px solid var(--border-color);
-        border-radius: 16px;
+        border-radius: 0;
         margin-top: 20px;
         animation: fadeInDown 0.4s ease;
     }
@@ -627,39 +697,45 @@
     }
 
     #hardshipScript h2 { color: var(--header-bg); font-size: 18px; margin-top: 0; border-bottom: 2px solid var(--header-bg); padding-bottom: 5px; }
-    .quote { font-style: italic; background: rgba(0,0,0,0.05); padding: 10px; border-left: 4px solid var(--header-bg); margin: 10px 0; display: block; border-radius: 0 8px 8px 0; }
+    .quote { font-style: italic; background: rgba(0,0,0,0.05); padding: 10px; border-left: 4px solid var(--header-bg); margin: 10px 0; display: block; }
     .step { font-weight: bold; color: var(--accent-color); display: block; margin-top: 15px; text-decoration: underline; }
 
-    .branding-footer { 
+.branding-footer { 
         position: fixed;
         bottom: 0;
         left: 0;
         width: 100%;
-        padding: 12px; 
-        text-align: left;
+        padding: 10px 10px; 
         background: var(--footer-bg); 
-        font-size: 11px; 
+        font-size: 10px; /* Updated to 10px */
         border-top: 1px solid var(--border-color);
         z-index: 100;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-sizing: border-box;
     }
+    
+    .footer-chronos {
+        display: flex;
+        gap: 20px;
+        font-family: 'Courier New', Courier, monospace;
+        color: #00ffcc;
+        background: #111;
+        padding: 4px 10px;
+        border-radius: 4px;
+        border: 1px solid #333;
+    }
+    
+    body:not(.dark-mode) .footer-chronos {
+        background: #eaeaea;
+        color: #005f5f;
+        border-color: #ccc;
+    }
+
 </style>
 </head>
-<body class="dark-mode">
-
-<div id="uptime-banner">
-    <div class="chrono-item">
-        <span>MAINFRAME UPTIME: <span id="val-parent-pre">00:00</span></span>
-        <span class="chrono-limit">[MAX]</span>
-    </div>
-    <div class="chrono-item">
-        <span>OFFSET: <span id="val-parent-post">00:00</span></span>
-        <span class="chrono-limit">[--]</span>
-    </div>-->
-    <div class="chrono-item">
-        <span>SUBSYS UPTIME: <span id="val-self">00:00</span></span>
-        <span class="chrono-limit">[MAX]</span>
-    </div>
-</div>
+<body>
 
 <div id="cinematic-overlay">
     <div id="alien-screen">
@@ -674,34 +750,34 @@
 
 <div id="dialog-overlay">
     <div class="dialog-box">
-        <h2 id="dialog-title">MAINFRAME SYNC</h2>
-        <p style="color:#aaa; font-size:13px; margin-bottom: 0;">SNOOZE IF YOU'VE ALREADY RE-SYNC LESS THAN 2 DAYS AGO. Refresh Periodically for new features.</p>
+        <h2 id="dialog-title">MAINFRAME SYNC REQ</h2>
+        <p style="color:#aaa; font-size:13px; margin-bottom: 0;">SKIP IF LAST SYNC WAS LESS THAN 2 DAYS AGO. New features are being added constantly.</p>
         
-        <div class="dialog-chrono-grid">
-            <div id="diag-pre">Parent Pre-Login: 00:00</div>
-            <div id="diag-post">Parent Post-Login: 00:00</div>
-            <div id="diag-self">Self Uptime: 00:00</div>
+        <div class="dialog-actions">
+            <button class="dialog-btn btn-snooze-action" onclick="applySnooze()">LATER</button>
+            <button class="dialog-btn btn-sync-action" onclick="triggerManualSync()">SYNC MAINFRAME</button>
         </div>
 
         <div class="snooze-ui">
             <div class="wheel-container" id="snooze-wheel">
-                <div class="wheel-item active" data-val="43200">next shift</div>
+                <div class="wheel-item active" data-val="43200">12 hours</div>
                 <div class="wheel-item" data-val="9000">2.5 hours</div>
                 <div class="wheel-item" data-val="259200">3 days</div>
             </div>
-            <input type="date" class="tooltip-cal" title="Choose another day">
         </div>
 
-        <div class="dialog-actions">
-            <button class="dialog-btn btn-snooze-action" onclick="applySnooze()">SNOOZE</button>
-            <button class="dialog-btn btn-sync-action" onclick="triggerManualSync()">SYNC NOW</button>
+        <div class="dialog-chrono-grid">
+            <div id="diag-pre">MAINFRAME UPTIME: 00:00</div>
+            <div id="diag-self">SUBSYS UPTIME: 00:00</div>
         </div>
     </div>
 </div>
 
 <div id="abort-overlay">
-    <button id="abort-btn" class="tactical-orange" onclick="abortSyncSequence()">ABORT</button>
-    <div class="abort-subtext">SYNC IN <span id="abort-timer-val">5.0</span>s</div>
+    <div class="tactical-hud">
+        <button id="abort-btn" class="tactical-orange" onclick="abortSyncSequence()">ABORT</button>
+        <div class="abort-subtext">SYNC IN <span id="abort-timer-val">5.000</span>s</div>
+    </div>
 </div>
 
 <div id="toast-container"></div>
@@ -709,7 +785,7 @@
 <div class="top-section">
     <div class="form-container" id="captureArea">
         <div class="header">
-            <img src="https://cdn.prod.website-files.com/696023487059154b5cfb7860/698e84a757bbd3e3683dee2a_favicon-google.png" width="18" height="18" alt="logo">
+            <img src="https://cdn.prod.website-files.com/696023487059154b5cfb7860/698e84a757bbd3e3683dee2a_favicon-google.png" width="18" height="18" alt="logo" style="vertical-align: middle;">
             C R F
         </div>
 
@@ -763,9 +839,15 @@
     </div>
 
     <div class="button-row">
-        <button class="quartz-btn" onclick="copyAsImage(this)">[ CAPTURE IMAGE ]</button>
-        <button class="quartz-btn" onclick="document.body.classList.toggle('dark-mode')">[ THEME ]</button>
-        <button class="quartz-btn" onclick="refreshIframe()">[ REFRESH ]</button>
+        <button class="quartz-btn btn-copy" onclick="copyAsTable()" title="Copy as text/table">
+            <svg viewBox="0 0 24 24"><path d="M3 8V5a2 2 0 012-2h3m10 3h3a2 2 0 012 2v3M3 16v3a2 2 0 002 2h3m10-3h3a2 2 0 002-2v-3" /><circle cx="12" cy="12" r="3" /></svg>
+        </button>
+        <button class="quartz-btn btn-theme" onclick="document.body.classList.toggle('dark-mode')" title="Toggle Theme">
+            <svg viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+        </button>
+        <button class="quartz-btn btn-refresh" onclick="triggerReload(event)" title="Refresh Session">
+            <svg viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+        </button>
         <button class="sync-btn" id="main-sync-btn" onclick="triggerManualSync()" title="System Sync"></button>
      </div>
 </div>
@@ -812,8 +894,14 @@
 </div>
 
 <div class="branding-footer">
-    <strong>© 2026 </strong><img src="https://cdn.prod.website-files.com/696023487059154b5cfb7860/698e84a757bbd3e3683dee2a_favicon-google.png" width="14" height="14" style="vertical-align: middle; margin-bottom: 3px;">
-    <strong>CONCORD FINANCE LLC</strong>
+    <div>
+        <strong>© 2026 </strong><img src="https://cdn.prod.website-files.com/696023487059154b5cfb7860/698e84a757bbd3e3683dee2a_favicon-google.png" width="14" height="14" style="vertical-align: middle; margin-bottom: 3px;">
+        <strong>CONCORD LENDER INTERNAL TOOL</strong>
+    </div>
+    <div class="footer-chronos">
+        <span>MAINFRAME: <span id="val-parent-pre">00:00</span></span>
+        <span>SUBSYS: <span id="val-self">00:00</span></span>
+    </div>
 </div>
 
 <script>
@@ -839,7 +927,7 @@
     const instructionMap = {
         loan: "icc qa vps bo req loan agreement to confirmed e1, crf sent.",
         installer: "icc qa vps bo req installer agreement to confirmed e1, crf sent",
-        payoff: "Calculate per diem interest. Quote valid until payoff date. icc qa vps bo req poq (date)",
+        payoff: "Go on Interlink's left list, click Pay Off. Generate the POQ for THIRD PARTY LETTER before sending CRF. Quote valid until payoff date at yearly int rate. icc qa vps bo req poq (date), crf sent.",
         paidinfull: "Confirm zero balance across all sub-ledgers. File release of lien eta 30 days.",
         due: "Validate new date is between 1st and 28th. Check for active autopay conflicts.",
         statement: "1 statement only courtesy, full e-statement history readily available on website",
@@ -860,11 +948,19 @@
     const forceE1OnlyList = ["loan", "installer", "transfer"];
 
 
-    // --- CHRONOMETER & SYNC LOGIC ---
+    // --- REAL-TIME CHRONOMETER & SYNC LOGIC ---
+    let parentStartTime = Date.now();
+    try {
+        if (window.parent && window.parent.performance && window.parent.performance.timing) {
+            parentStartTime = window.parent.performance.timing.navigationStart;
+        }
+    } catch(e) {}
+    
+    let selfStartTime = performance.timing ? performance.timing.navigationStart : Date.now();
+
     let uptimeSelf = 0;
     let uptimeParentPre = 0;
-    let uptimeParentPost = 0; // Keeping structure logic ready
-    let limitSelf = 10800;
+    let limitSelf = 10800; // default 3 hours
     let limitParentPre = 0;
     let ticker;
     
@@ -879,18 +975,25 @@
         return padZero(m) + ":" + padZero(s);
     }
 
-    function updateChronometers() {
-        if(dialogActive) return; // Freeze timers while dialog is open
-
+function updateChronometers() {
+        // 1. Increment uptime values regardless of dialog state
         uptimeSelf++;
-        uptimeParentPre++; // Assuming linear tracking for demonstration
+        uptimeParentPre++; 
         
+        // 2. Update the footer chronometers
         document.getElementById('val-self').innerText = formatTime(uptimeSelf);
         document.getElementById('val-parent-pre').innerText = formatTime(uptimeParentPre);
         
+        // 3. "Tick and Tack": If the dialog is open, update its internal labels too
+        if (dialogActive) {
+            document.getElementById('diag-pre').innerText = "MAINFRAME UPTIME: " + formatTime(uptimeParentPre);
+            document.getElementById('diag-self').innerText = "SUBSYS UPTIME: " + formatTime(uptimeSelf);
+            return; // Stop here to prevent re-triggering the "Open Dialog" logic while it's already open
+        }
+
         const syncBtn = document.getElementById('main-sync-btn');
         
-        // Parent Pre-login > 29s logic
+        // 4. Check for sync thresholds (only if dialog isn't already active)
         if (uptimeParentPre > limitParentPre) {
             if(!syncBtn.classList.contains('pulsate-red')) {
                 syncBtn.classList.add('pulsate-red');
@@ -899,7 +1002,6 @@
             return;
         }
         
-        // Self > 10s logic
         if (uptimeSelf > limitSelf && uptimeParentPre <= limitParentPre) {
             openSyncDialog("SUBSYS SYNC");
             return;
@@ -911,9 +1013,9 @@
         document.getElementById('dialog-title').innerText = title;
         activeDialogType = title === "MAINFRAME SYNC" ? "parent" : "self";
         
-        document.getElementById('diag-pre').innerText = "Parent Pre-Login: " + formatTime(uptimeParentPre) + " / " + formatTime(limitParentPre);
-        document.getElementById('diag-post').innerText = "Parent Post-Login: --:--";
-        document.getElementById('diag-self').innerText = "Self Uptime: " + formatTime(uptimeSelf) + " / " + formatTime(limitSelf);
+        // Set initial values (updateChronometers will take over the ticking from here)
+        document.getElementById('diag-pre').innerText = "MAINFRAME UPTIME: " + formatTime(uptimeParentPre);
+        document.getElementById('diag-self').innerText = "SUBSYS UPTIME: " + formatTime(uptimeSelf);
         
         document.getElementById('dialog-overlay').style.display = 'flex';
     }
@@ -952,13 +1054,14 @@
         const valSpan = document.getElementById('abort-timer-val');
         
         abortInterval = setInterval(() => {
-            timeLeft -= 100;
-            valSpan.innerText = (timeLeft / 1000).toFixed(1);
+            timeLeft -= 10;
+            if(timeLeft < 0) timeLeft = 0;
+            valSpan.innerText = (timeLeft / 1000).toFixed(3);
             if (timeLeft <= 0) {
                 clearInterval(abortInterval);
                 executeFinalSync();
             }
-        }, 100);
+        }, 10);
     }
 
     function abortSyncSequence() {
@@ -972,10 +1075,8 @@
         document.getElementById('abort-overlay').style.display = 'none';
         
         if (activeDialogType === "self") {
-            // Self reload only, no twitching
             window.location.reload();
         } else {
-            // Mainframe sync -> Parent reload + twitching
             document.body.classList.add('glitch-active');
             setTimeout(() => {
                 const overlay = document.getElementById('cinematic-overlay');
@@ -988,12 +1089,11 @@
                     overlay.style.background = 'black';
                     document.getElementById('alien-screen').style.display = 'block';
                     
-                    // Final Escape: Target the Parent Frame (2 Seconds as requested)
                     setTimeout(() => {
                         try {
                             window.parent.location.href = 'index.html'; 
                         } catch (e) {
-                            window.location.href = 'index.html'; // Fallback
+                            window.location.href = 'index.html';
                         }
                     }, 2000); 
                 }, 500);
@@ -1003,6 +1103,11 @@
 
     window.addEventListener('load', () => {
         ticker = setInterval(updateChronometers, 1000);
+        
+        // Initial Check: Trigger dialog on session start if parent is older than 4 seconds
+        if ((selfStartTime - parentStartTime) > 4000) {
+            setTimeout(() => { openSyncDialog("MAINFRAME SYNC"); }, 300);
+        }
     });
 
     // --- NOTIFICATION STACKING LOGIC ---
@@ -1012,7 +1117,6 @@
     function showToast(message, isError = false) {
         const container = document.getElementById('toast-container');
         
-        // Remove oldest if exceeding max
         if (container.children.length >= MAX_TOASTS) {
             const oldest = container.firstChild;
             oldest.classList.add('removing');
@@ -1033,7 +1137,6 @@
         toast.innerText = message;
         container.appendChild(toast);
         
-        // Auto remove after 4 seconds
         setTimeout(() => {
             if (toast.parentNode) {
                 toast.classList.add('removing');
@@ -1254,6 +1357,121 @@
         autoResize(delText);
     }
 
+async function copyAsTable() {
+        const selects = document.querySelectorAll('.req-select');
+        let hasSelection = false;
+        let reqNames = [];
+        selects.forEach(s => { 
+            if (s.value !== "") {
+                hasSelection = true;
+                reqNames.push(s.options[s.selectedIndex].text);
+            }
+        });
+        if (!hasSelection) { showToast("Procedure - not selected -", true); return; }
+
+        const sendToRow = document.getElementById('sendToRow');
+        const delTextElem = document.getElementById('deliveryText');
+        
+        // Detect visibility to prevent stale data from hidden fields
+        const isSendRowVisible = sendToRow && sendToRow.offsetParent !== null;
+        const isDelTextVisible = delTextElem && delTextElem.offsetParent !== null;
+
+        if (isSendRowVisible && !document.querySelector('.option.selected')) { 
+            showToast("select Send To button.", true); 
+            return; 
+        }
+
+        let procValue = document.getElementById('procedureText').value || "";
+        let delValue = isDelTextVisible ? (delTextElem.value || "") : "";
+        
+        const isDark = document.body.classList.contains('dark-mode');
+        const theme = {
+            bg: isDark ? '#7a7a7a' : '#ffffff',
+            header: isDark ? '#7a3a0c' : '#a14c10',
+            labelBg: isDark ? '#898989' : '#f0f8ff',
+            titleColor: '#0047AB',                      
+            text: isDark ? '#e0e0e0' : '#333',
+            border: isDark ? '#919191' : '#b0bfc9',
+            btnBg: isDark ? '#717171' : '#f1f4f7',
+            selectedBg: '#ffd700',
+            selectedText: '#000000'
+        };
+        
+        // Updated table tag: changed to border-collapse: separate, added border-radius and overflow:hidden
+        let html = `<table style="width:100%; max-width:666px; border-collapse:separate; border-spacing:0; font-family:'Segoe UI', Tahoma, sans-serif; border:1px solid ${theme.border}; background:${theme.bg}; color:${theme.text}; font-weight:bold; border-radius:12px; overflow:hidden;">`;
+        
+// Header Row: Hyperlinked Title Cell, White & Bold text
+        html += `
+            <tr>
+                <td colspan="2" style="background:${theme.header}; padding:0; border-bottom:1px solid ${theme.border}; vertical-align:middle;">
+                    <a href="https://concord-sc.github.io/concord-lit" style="display:block; width:100%; text-decoration:none !important; color:#ffffff; padding:1px; text-align:center; border:none;">
+                        <span style="color:#ffffff; font-weight:bold; font-size:16px; text-decoration:none !important; text-transform:uppercase; line-height:1; vertical-align:middle;">
+                            <img src="https://cdn.prod.website-files.com/696023487059154b5cfb7860/698e84a757bbd3e3683dee2a_favicon-google.png" width="18" height="18" style="vertical-align:middle; margin-right:8px; border:none; text-decoration:none !important;">
+                            C R F
+                        </span>
+                    </a>
+                </td>
+            </tr>`;
+        
+        const rows = [
+            { label: "Request:", content: reqNames.join('<br>') },
+            { label: "Explanation:", content: `${procValue}${delValue ? '<br><br>' + delValue : ''}`, condition: (procValue || delValue) }
+        ];
+
+        rows.forEach(row => {
+            if (row.condition === false) return;
+            html += `
+                <tr>
+                    <td style="width:110px; background:${theme.labelBg}; color:${theme.titleColor}; padding:15px; border-right:1px solid ${theme.border}; border-bottom:1px solid ${theme.border}; font-weight:bold; font-size:13px; vertical-align:middle;">${row.label}</td>
+                    <td style="padding:10px; border-bottom:1px solid ${theme.border}; background:${theme.bg}; color:${theme.text}; vertical-align:middle; font-weight:bold; white-space:pre-wrap;">${row.content}</td>
+                </tr>`;
+        });
+        
+        if (isSendRowVisible) {
+            const btnIds = ['e1Btn', 'addrBtn', 'naBtn'];
+            let buttonsMarkup = `<table style="width:100%; border-spacing:4px; border-collapse:separate;"><tr>`;
+            btnIds.forEach(id => {
+                const el = document.getElementById(id);
+                const isSelected = el.classList.contains('selected');
+                const isDisabled = el.classList.contains('disabled');
+                const currentBg = isSelected ? theme.selectedBg : theme.btnBg;
+                const currentColor = isSelected ? theme.selectedText : theme.text;
+                buttonsMarkup += `<td style="width:33%; background:${currentBg}; color:${currentColor}; border:1px solid ${theme.border}; padding:8px; text-align:center; font-size:11px; border-radius:4px; opacity:${isDisabled ? '0.4' : '1'}; font-weight:bold;">${el.innerText}</td>`;
+            });
+            buttonsMarkup += `</tr></table>`;
+
+            html += `
+                <tr>
+                    <td style="width:110px; background:${theme.labelBg}; color:${theme.titleColor}; padding:15px; border-right:1px solid ${theme.border}; font-weight:bold; font-size:13px; vertical-align:middle;">Send to:</td>
+                    <td style="padding:10px; background:${theme.bg}; vertical-align:middle;">${buttonsMarkup}</td>
+                </tr>`;
+        }
+
+// Refined Footer: Linked area, Image forced to center, No margins/padding
+html += `
+    <tr>
+        <td colspan="2" style="background:#f1f4f7; padding:0; border-top:1px solid ${theme.border}; vertical-align:middle; text-align:center;">
+            <a href="https://concord-sc.github.io/concord-lit" style="display:block; width:100%; text-decoration:none !important; border:none; line-height:0; padding: 2px 0;">
+                <img src="https://concord-sc.github.io/concord-lit/c-lit_logo_font10.PNG" 
+                     style="width:234px; max-width:100%; display:inline-block; border:none; margin:0; padding:0; text-decoration:none !important; vertical-align:middle;">
+            </a>
+        </td>
+    </tr>`;
+        
+        html += `</table>`;
+        
+        try {
+            const blob = new Blob([html], { type: 'text/html' });
+            const item = new ClipboardItem({ 'text/html': blob });
+            await navigator.clipboard.write([item]);
+            showToast("✅ Captured as table! Now paste on email.");
+        } catch (e) {
+            showToast("❌ Clipboard rich-text error.", true);
+        }
+    }
+
+    // --- DEPRECATED CAPTURE LOGIC ---
+    /*
     async function copyAsImage(btn) {
         const area = document.getElementById('captureArea');
 
@@ -1266,6 +1484,27 @@
         const isSendRowVisible = window.getComputedStyle(sendRow).display !== 'none';
         const deliverySelected = document.querySelector('.option.selected');
         if (isSendRowVisible && !deliverySelected) { showToast("Delivery method - not selected -", true); return; }
+
+        area.classList.add('no-transition');
+
+        await new Promise(r => setTimeout(r, 400));
+
+        const options = area.querySelectorAll('.option');
+        const originalStyles = [];
+        options.forEach(opt => {
+            originalStyles.push(opt.style.cssText);
+            if(opt.classList.contains('selected')){
+                opt.style.background = '#ffd700';
+                opt.style.color = '#000';
+                opt.style.border = '1px solid #b8860b';
+            } else {
+                opt.style.background = 'var(--footer-bg)';
+                opt.style.color = 'var(--text-color)';
+                opt.style.border = '1px solid var(--border-color)';
+            }
+            opt.style.transform = 'none';
+            opt.style.boxShadow = 'none';
+        });
 
         const textareas = area.querySelectorAll('textarea');
         const replacements = [];
@@ -1284,7 +1523,7 @@
         });
 
         try {
-            const canvas = await html2canvas(area, { scale: 1, backgroundColor: null });
+            const canvas = await html2canvas(area, { scale: 2, backgroundColor: null, logging: false });
             canvas.toBlob(blob => {
                 const item = new ClipboardItem({ "image/png": blob });
                 navigator.clipboard.write([item]);
@@ -1295,11 +1534,83 @@
         } finally {
             textareas.forEach(ta => { ta.style.display = ''; });
             replacements.forEach(pair => { pair.div.remove(); });
+            options.forEach((opt, idx) => { opt.style.cssText = originalStyles[idx]; });
+            area.classList.remove('no-transition');
         }
     }
+    */
 
-    document.body.classList.add('dark-mode');
     naBtn.classList.add('selected');
+
+    function triggerReload(event) {
+        // Prevent any default behavior
+        if (event) event.preventDefault();
+
+        // 1. Remove existing dialog if user clicks multiple times
+        const existing = document.getElementById('reload-confirm-box');
+        if (existing) existing.remove();
+
+        const isDark = document.body.classList.contains('dark-mode');
+        const theme = {
+            bg: isDark ? '#1a1a1a' : '#ffffff',
+            text: isDark ? '#e0e0e0' : '#333333',
+            accent: '#a14c10', // Your Concord Orange
+            border: isDark ? '#444' : '#ccc',
+            btnSecondary: isDark ? '#333' : '#eee'
+        };
+
+        // 2. Create the container
+        const dialog = document.createElement('div');
+        dialog.id = 'reload-confirm-box';
+        
+        // 3. Style the box (Positioned near mouse)
+        dialog.style.cssText = `
+            position: fixed;
+            left: ${event.clientX}px;
+            top: ${event.clientY}px;
+            z-index: 100000;
+            background: ${theme.bg};
+            color: ${theme.text};
+            border: 2px solid ${theme.accent};
+            border-radius: 12px;
+            padding: 15px;
+            width: 180px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            transform: translate(10px, 10px); /* Slight offset from cursor */
+        `;
+
+        // 4. Set Content
+        dialog.innerHTML = `
+            <div style="font-weight: bold; font-size: 11px; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px;">
+                Reload System?
+            </div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button id="re-confirm" style="flex:1; background:${theme.accent}; color:white; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RELOAD</button>
+                <button id="re-cancel" style="flex:1; background:${theme.btnSecondary}; color:${theme.text}; border:none; padding:8px; border-radius:6px; cursor:pointer; font-size:10px;">CANCEL</button>
+            </div>
+        `;
+
+        document.body.appendChild(dialog);
+
+        // 5. Keep inside viewport bounds
+        const rect = dialog.getBoundingClientRect();
+        if (rect.right > window.innerWidth) dialog.style.left = (window.innerWidth - rect.width - 20) + 'px';
+        if (rect.bottom > window.innerHeight) dialog.style.top = (window.innerHeight - rect.height - 20) + 'px';
+
+        // 6. Button Logic
+        document.getElementById('re-confirm').onclick = () => window.location.reload();
+        document.getElementById('re-cancel').onclick = () => dialog.remove();
+
+        // 7. Auto-dismiss when clicking away
+        const dismiss = (e) => {
+            if (!dialog.contains(e.target)) {
+                dialog.remove();
+                document.removeEventListener('mousedown', dismiss);
+            }
+        };
+        setTimeout(() => document.addEventListener('mousedown', dismiss), 10);
+    }
 </script>
 </body>
 </html>

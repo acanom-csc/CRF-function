@@ -754,14 +754,14 @@
         <p style="color:#aaa; font-size:13px; margin-bottom: 0;">SYNC ONCE EVERY SHIFT START</p>
         
         <div class="dialog-actions">
-            <button class="dialog-btn btn-snooze-action" onclick="applySnooze()">later / already</button>
+            <button class="dialog-btn btn-snooze-action" onclick="applySnooze()">l a t e r</button>
             <button class="dialog-btn btn-sync-action" onclick="triggerManualSync()">SYNC NOW</button>
         </div>
 
         <div class="snooze-ui">
             <div class="wheel-container" id="snooze-wheel"> Remind me in:
-                <div class="wheel-item active" data-val="43200">12 hours</div>
-                <div class="wheel-item" data-val="9000">2.5 hours</div>
+                <div class="wheel-item active" data-val="60">59 secs</div>
+                <div class="wheel-item" data-val="4500">75 mins</div>
                 <div class="wheel-item" data-val="259200">3 days</div>
             </div>
         </div>
@@ -776,7 +776,7 @@
 <div id="abort-overlay">
     <div class="tactical-hud">
         <button id="abort-btn" class="tactical-orange" onclick="abortSyncSequence()">ABORT</button>
-        <div class="abort-subtext">SYNC IN <span id="abort-timer-val">5.000</span>s</div>
+        <div class="abort-subtext">SYNC IN <span id="abort-timer-val">3.000</span>s</div>
     </div>
 </div>
 
@@ -811,6 +811,7 @@
                             <option value="closing">Loan Closing Certificate</option>
                             <option value="refund">Refund</option>
                             <option value="hardship">Hardship</option>
+                            <option value="bankruptcy">Bankruptcy</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
@@ -921,6 +922,7 @@
         closing: "Borrower requested Loan Closing Certificate",
         refund: "Borrower requested Refund",
         hardship: `1. Reason for Hardship?\n2. What type of income is coming into your household?\n3. How much income is coming into your household?\n4. What are your monthly expenses?\n5. What steps will you take to resume pmts after the extension?\n\nPast due: # of days / current\nHardship for: # of months\nWilling to set autopay:\nApproved / Denied by:\nIf denied reason why:\n`,
+        bankruptcy: "Law firm / Lawyer:\nAddress:\nTelephone:\nEmail:\nCase:\nChapter:\nDate filed:\nSolar Servicing included:\nIndividual / Joint (spouses):\n",
         other: "Borrower requested [Custom]"
     };
 
@@ -932,6 +934,7 @@
         due: "Validate new date is between 1st and 28th. Check for active autopay conflicts.",
         statement: "1 statement only courtesy, full e-statement history readily available on website",
         refund: "Validate overage exact amount",
+        bankruptcy: "This is the information we need to gather: (if they have it)",
         other: "PROCEDURE: ad libitum."
     };
 
@@ -939,11 +942,10 @@
         loan: "Loan Agreement", installer: "Installer Agreement", transfer: "Transfer Agreement", payoff: "Payoff Quote", transition: "Transition Letter",
         cancellation: "Cancellation Letter", paidinfull: "Paid in Full Letter", due: "Due Date Change",
         history: "Transaction History", statement: "1 Statement Courtesy", receipt: "Payment Received Letter",
-        closing: "Loan Closing Certificate", refund: "Refund", hardship: "Hardship", other: "Other"
+        closing: "Loan Closing Certificate", refund: "Refund", hardship: "Hardship", bankruptcy: "Bankruptcy", other: "Other"
     };
 
-    const hideList = ["due", "refund", "hardship"];
-    const auth3rdPartyList = ["payoff", "transition", "cancellation", "paidinfull", "history", "statement", "closing", "receipt", "other"];
+const hideList = ["due", "refund", "hardship", "bankruptcy"];    const auth3rdPartyList = ["payoff", "transition", "cancellation", "paidinfull", "history", "statement", "closing", "receipt", "other"];
     const blockNAList = ["loan", "installer", "transfer"];
     const forceE1OnlyList = ["loan", "installer", "transfer"];
 
@@ -960,8 +962,8 @@
 
     let uptimeSelf = 0;
     let uptimeParentPre = 0;
-    let limitSelf = 10800; // default 3 hours
-    let limitParentPre = 0;
+    let limitSelf = 10800; // SUBSYS SYNC ON 3H
+    let limitParentPre = 3;
     let ticker;
     
     let abortInterval;
@@ -1022,7 +1024,7 @@ function updateChronometers() {
 
     // Wheel Interaction
     const wheelItems = document.querySelectorAll('.wheel-item');
-    let snoozeSeconds = 43200; // default 12 hours next shift
+    let snoozeSeconds = 4500; // 75 MIN
     wheelItems.forEach(item => {
         item.addEventListener('click', (e) => {
             wheelItems.forEach(wi => wi.classList.remove('active'));
@@ -1583,7 +1585,7 @@ html += `
         // 4. Set Content
         dialog.innerHTML = `
             <div style="font-weight: bold; font-size: 11px; margin-bottom: 12px; text-align: center; text-transform: uppercase; letter-spacing: 1px;">
-                Reload System?
+                Reload Form?
             </div>
             <div style="display: flex; gap: 10px; justify-content: center;">
                 <button id="re-confirm" style="flex:1; background:${theme.accent}; color:white; border:none; padding:8px; border-radius:6px; font-weight:bold; cursor:pointer; font-size:10px;">RELOAD</button>

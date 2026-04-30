@@ -1380,7 +1380,7 @@ async function copyAsTable() {
         const isDelTextVisible = delTextElem && delTextElem.offsetParent !== null;
 
         if (isSendRowVisible && !document.querySelector('.option.selected')) { 
-            showToast("select Send To button.", true); 
+            showToast("Send To not selected.", true); 
             return; 
         }
 
